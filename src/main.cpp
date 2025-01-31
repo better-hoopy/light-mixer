@@ -1,18 +1,37 @@
 #include <Arduino.h>
+#include "FastLED.h"
 
-// put function declarations here:
-int myFunction(int, int);
+#define NUM_LEDS      100
+#define LED_TYPE   WS2811
+#define COLOR_ORDER   GRB
+#define DATA_PIN       13
+
+#define RED_POT_PIN    34
+#define GREEN_POT_PIN  39
+#define BLUE_POT_PIN   36
+
+CRGBArray<NUM_LEDS> leds;
+uint32_t lastTick = 0;
+uint8_t hue = 0;
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  Serial.begin(115200);
+  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  if (lastTick + 100 < millis()) {
+    uint8_t red = map(analogRead(RED_POT_PIN), 0, 4095, 0, 255);
+    uint8_t green = map(analogRead(GREEN_POT_PIN), 0, 4095, 0, 255);
+    uint8_t blue = map(analogRead(BLUE_POT_PIN), 0, 4095, 0, 255);
+    Serial.print(" red: ");
+    Serial.print(red);
+    Serial.print(" green: ");
+    Serial.print(green);
+    Serial.print(" blue: ");
+    Serial.println(blue);
+    leds.fill_solid(CRGB(red, green, blue));
+    FastLED.show();
+    lastTick = millis();
+  }
 }
